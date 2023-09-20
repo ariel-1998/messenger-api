@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-type IUserModel = {
+export type IUserModel = {
   name: string;
   email: string;
   password: string;
@@ -9,13 +9,16 @@ type IUserModel = {
 
 const userSchema = new mongoose.Schema<IUserModel>(
   {
-    name: { type: String, required: true },
-    email: { type: String, required: true },
-    password: { type: String, required: true },
+    name: { type: String, required: [true, "Name is required"] },
+    email: {
+      type: String,
+      required: [true, "Email is required"],
+      unique: true,
+    },
+    password: { type: String, required: [true, "Password is required"] },
     image: {
       type: String,
-      required: true,
-      default: "", //need to add link
+      default: "asd", //need to add link
     },
   },
   { timestamps: true }
