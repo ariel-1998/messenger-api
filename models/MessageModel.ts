@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 type IMessageModel = {
+  _id: mongoose.Schema.Types.ObjectId;
   sender: mongoose.Schema.Types.ObjectId;
   content: string;
   chat: mongoose.Schema.Types.ObjectId;
@@ -14,6 +15,7 @@ const messageSchema = new mongoose.Schema<IMessageModel>(
   },
   {
     timestamps: true,
+    versionKey: false,
   }
 );
 

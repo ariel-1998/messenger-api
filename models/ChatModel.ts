@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 type IChatModel = {
+  _id: mongoose.Schema.Types.ObjectId;
   chatName: string;
   isGroupChat: boolean;
   users: mongoose.Schema.Types.ObjectId[];
@@ -18,6 +19,7 @@ const chatSchema = new mongoose.Schema<IChatModel>(
   },
   {
     timestamps: true,
+    versionKey: false,
   }
 );
 
