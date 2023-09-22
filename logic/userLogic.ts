@@ -1,47 +1,34 @@
+import { Response, NextFunction } from "express";
 import expressAsyncHandler from "express-async-handler";
-import { createJWT } from "../dataLayer/createJWT";
-import { DynamicErrorModel, MongoErrorModel } from "../models/ErrorModel";
-import { IUserModel, UserModel } from "../models/UserModel";
-import { NextFunction, Response, Request } from "express";
-import { CredentialsModel } from "../models/CredentialsModel";
+import { CustomReq } from "../models/CustomReq";
+import { UserModel } from "../models/UserModel";
 
-export const registerUser = expressAsyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    console.log(req.body);
-    const { email } = req.body as IUserModel;
-
-    const isExist = await UserModel.findOne({ email });
-    if (isExist) {
-      return next(new DynamicErrorModel("User already exist", 409));
+export const searchUser = expressAsyncHandler(
+  async (req: CustomReq, res: Response, next: NextFunction) => {
+    const { search } = req.query;
+    const { _id: reqUserId } = req.user;
+    if (search) {
+      const users = await UserModel.find({
+        $and: [
+          {
+            $or: [
+              { name: { $regex: search, $options: "i" } },
+              { email: { $regex: search, $options: "i" } },
+            ],
+          },
+          { _id: { $ne: reqUserId } },
+        ],
+      });
+      users.length ? res.status(200).json(users) : res.sendStatus(404);
+      return;
     }
-
-    const rawUser: IUserModel = new UserModel(req.body);
-    const errors = rawUser.validateSync();
-
-    if (errors) return next(new MongoErrorModel(errors));
-
-    const newUser = await rawUser.save();
-    if (!rawUser) {
-      return next(new DynamicErrorModel("Server error, try again later", 500));
-    }
-    const jwt = createJWT(newUser);
-    res.status(201).json(jwt);
+    res.sendStatus(404);
   }
 );
 
-export const loginUser = expressAsyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { email, password } = req.body as CredentialsModel;
-
-    const user = await UserModel.findOne({ email });
-    if (user) {
-      const isAuthorized = await user.passwordCompare(password); //need to change any
-      if (isAuthorized) {
-        const jwt = createJWT(user);
-        res.status(200).json(jwt);
-        return;
-      }
-    }
-    next(new DynamicErrorModel("Email or password are incorrect", 401));
-  }
-);
+//   const users = await UserModel.find({
+//     $or: [
+//       { name: search, $options: "i" },
+//       { email: search, $options: "i" },
+//     ],
+//   }).find({ _id: { $ne: req.user._id } });

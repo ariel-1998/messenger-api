@@ -5,7 +5,7 @@ export function createJWT(user: IUserModel) {
   const { _id, name, email, image } = user;
   return jwt.sign(
     {
-      sub: _id,
+      _id,
       name,
       email,
       image,
