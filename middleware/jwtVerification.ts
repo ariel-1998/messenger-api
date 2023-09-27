@@ -3,7 +3,7 @@ import expressAsyncHandler from "express-async-handler";
 import { CustomReq } from "../models/CustomReq";
 import jwt, { decode } from "jsonwebtoken";
 import { IUserModel, UserModel } from "../models/UserModel";
-import { DynamicErrorModel } from "../models/ErrorModel";
+import { DynamicError } from "../models/ErrorModel";
 
 export const jwtVerification = expressAsyncHandler(
   async (req: CustomReq, res: Response, next: NextFunction) => {
@@ -15,7 +15,7 @@ export const jwtVerification = expressAsyncHandler(
       req.user = await UserModel.findById(decoded._id); //change it later
       next();
     } catch (error) {
-      next(new DynamicErrorModel("You are not signed in!", 401));
+      next(new DynamicError("You are not signed in!", 401));
     }
   }
 );

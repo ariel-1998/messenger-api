@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-type IMessageModel = {
+export type IMessageModel = {
   _id: mongoose.Schema.Types.ObjectId;
   sender: mongoose.Schema.Types.ObjectId;
   content: string;

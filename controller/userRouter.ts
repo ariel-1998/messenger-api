@@ -4,4 +4,4 @@ import { searchUser } from "../logic/userLogic";
 
 export const userRouter = Router();
 userRouter.use(jwtVerification);
-userRouter.get("/search", searchUser);
+userRouter.get("/", searchUser);

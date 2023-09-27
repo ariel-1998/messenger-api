@@ -14,6 +14,7 @@ const app = express();
 app.use(cors());
 app.use(json());
 app.use("/api/auth", authRouter);
+app.use("/api/user", userRouter);
 app.use("/api/chat", chatRouter);
 
 app.use(RouteNotFound);

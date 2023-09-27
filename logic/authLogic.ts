@@ -1,18 +1,17 @@
 import expressAsyncHandler from "express-async-handler";
 import { createJWT } from "../dataLayer/createJWT";
-import { DynamicErrorModel, MongoErrorModel } from "../models/ErrorModel";
+import { DynamicError, MongoErrorModel } from "../models/ErrorModel";
 import { IUserModel, UserModel } from "../models/UserModel";
 import { NextFunction, Response, Request } from "express";
 import { CredentialsModel } from "../models/CredentialsModel";
 
 export const registerUser = expressAsyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log(req.body);
     const { email } = req.body as IUserModel;
 
     const isExist = await UserModel.findOne({ email });
     if (isExist) {
-      return next(new DynamicErrorModel("User already exist", 409));
+      return next(new DynamicError("User already exist", 409));
     }
 
     const rawUser: IUserModel = new UserModel(req.body);
@@ -22,7 +21,7 @@ export const registerUser = expressAsyncHandler(
 
     const newUser = await rawUser.save();
     if (!rawUser) {
-      return next(new DynamicErrorModel("Server error, try again later", 500));
+      return next(new DynamicError("Server error, try again later", 500));
     }
     const jwt = createJWT(newUser);
     res.status(201).json(jwt);
@@ -42,6 +41,6 @@ export const loginUser = expressAsyncHandler(
         return;
       }
     }
-    next(new DynamicErrorModel("Email or password are incorrect", 401));
+    next(new DynamicError("Email or password are incorrect", 401));
   }
 );
