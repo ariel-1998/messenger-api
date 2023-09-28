@@ -1,6 +1,6 @@
 import express, { json } from "express";
 import * as dotenv from "dotenv";
-import { connectToDB } from "./dataLayer/DB";
+import { connectToDB } from "./utils/DB";
 import { authRouter } from "./controller/authRouter";
 import { RouteNotFound, errorHandler } from "./middleware/errorMiddleware";
 import cors from "cors";

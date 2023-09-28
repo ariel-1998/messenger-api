@@ -4,7 +4,9 @@ import {
   accessChat,
   addMembersToGroup,
   createGroupChat,
+  deleteGroupChat,
   getAllChats,
+  removeMembersFromGroup,
   renameGroup,
 } from "../logic/chatLogic";
 
@@ -14,7 +16,7 @@ chatRouter.use(jwtVerification);
 
 chatRouter.route("/").post(accessChat).get(getAllChats);
 chatRouter.post("/group", createGroupChat);
+chatRouter.delete("/group/:groupId", deleteGroupChat);
 chatRouter.put("/group/:groupId/rename", renameGroup);
 chatRouter.put("/group/:groupId/members", addMembersToGroup);
-
-// chatRouter.route("/group").post().put();
+chatRouter.delete("/group/:groupId/members/:userId", removeMembersFromGroup);

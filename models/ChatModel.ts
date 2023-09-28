@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { UserModel } from "./UserModel";
+import { DynamicError } from "./ErrorModel";
 
 export type IChatModel = {
   _id: mongoose.Schema.Types.ObjectId;

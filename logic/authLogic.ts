@@ -1,5 +1,5 @@
 import expressAsyncHandler from "express-async-handler";
-import { createJWT } from "../dataLayer/createJWT";
+import { createJWT } from "../utils/createJWT";
 import { DynamicError, MongoErrorModel } from "../models/ErrorModel";
 import { IUserModel, UserModel } from "../models/UserModel";
 import { NextFunction, Response, Request } from "express";

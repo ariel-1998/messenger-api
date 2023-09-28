@@ -3,11 +3,12 @@ import expressAsyncHandler from "express-async-handler";
 import { CustomReq } from "../models/CustomReq";
 import { UserModel } from "../models/UserModel";
 import { DynamicError } from "../models/ErrorModel";
+import { ObjectId } from "mongoose";
 
 export const searchUser = expressAsyncHandler(
   async (req: CustomReq, res: Response, next: NextFunction) => {
     const { search } = req.query;
-    const { _id: reqUserId } = req.user;
+    const reqUserId = req.user._id as ObjectId;
     if (!search) return next(new DynamicError("Not Found!", 404));
 
     const users = await UserModel.find({
