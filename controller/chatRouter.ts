@@ -19,4 +19,4 @@ chatRouter.post("/group", createGroupChat);
 chatRouter.delete("/group/:groupId", deleteGroupChat);
 chatRouter.put("/group/:groupId/rename", renameGroup);
 chatRouter.put("/group/:groupId/members", addMembersToGroup);
-chatRouter.delete("/group/:groupId/members/:userId", removeMembersFromGroup);
+chatRouter.put("/group/:groupId/members/:userId", removeMembersFromGroup);

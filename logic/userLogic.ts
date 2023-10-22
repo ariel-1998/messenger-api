@@ -1,7 +1,7 @@
 import { Response, NextFunction } from "express";
 import expressAsyncHandler from "express-async-handler";
 import { CustomReq } from "../models/CustomReq";
-import { UserModel } from "../models/UserModel";
+import { IUserModel, UserModel } from "../models/UserModel";
 import { DynamicError } from "../models/ErrorModel";
 import { ObjectId } from "mongoose";
 
@@ -22,7 +22,6 @@ export const searchUser = expressAsyncHandler(
         { _id: { $ne: reqUserId } },
       ],
     });
-
     users.length ? res.status(200).json(users) : res.sendStatus(404);
   }
 );

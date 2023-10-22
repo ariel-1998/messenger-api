@@ -3,7 +3,6 @@ import { ErrorModel } from "../models/ErrorModel";
 
 export function RouteNotFound(req: Request, res: Response, next: NextFunction) {
   const error = `URL Not Found: ${req.originalUrl}`;
-  console.log(error);
   res.status(404).json({ message: error });
 }
 

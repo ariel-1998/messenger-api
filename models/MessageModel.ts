@@ -10,8 +10,21 @@ export type IMessageModel = {
 const messageSchema = new mongoose.Schema<IMessageModel>(
   {
     sender: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    content: { type: String, trim: true },
-    chat: { type: mongoose.Schema.Types.ObjectId, ref: "chat" },
+    content: {
+      type: String,
+      trim: true,
+      required: [true, "Message was not provided!"],
+    },
+    chat: {
+      type: mongoose.Schema.Types.ObjectId,
+      validate(value: string) {
+        if (!mongoose.Types.ObjectId.isValid(value)) {
+          throw Error("Invalid users were sent!");
+        }
+      },
+      required: [true, "chatId was not provided!"],
+      ref: "Chat",
+    },
   },
   {
     timestamps: true,

@@ -1,9 +1,7 @@
-import mongoose from "mongoose";
+import { ObjectId } from "mongoose";
 import { UserModel } from "../models/UserModel";
 
-export const validateUsersArr = async (
-  usersArr: mongoose.Schema.Types.ObjectId[]
-) => {
+export const validateUsersArr = async (usersArr: ObjectId[]) => {
   try {
     const userExistenceCheck = await UserModel.find({
       _id: { $in: usersArr },
