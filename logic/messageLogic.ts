@@ -25,7 +25,7 @@ export const sendMessage = expressAsyncHandler(
 
     try {
       let message = await MessageModel.create(newMsg);
-      message = await message.populate("sender", "name image");
+      message = await message.populate("sender", "name image _id");
       message = await message.populate("chat");
       //check if need to populate users, (in the video its with populated users)!!!
       //   let message = await MessageModel.create(newMsg);

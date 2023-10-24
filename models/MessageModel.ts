@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { IUserModel } from "./UserModel";
+import { IChatModel } from "./ChatModel";
 
 export type IMessageModel = {
   _id: mongoose.Schema.Types.ObjectId;
@@ -36,3 +38,10 @@ export const MessageModel = mongoose.model<IMessageModel>(
   "Message",
   messageSchema
 );
+
+export type SocketMessageModel = {
+  _id: string;
+  sender: Omit<IUserModel, "password">;
+  content: string;
+  chat: Omit<IChatModel, "users"> & { users: string[] };
+};
