@@ -7,6 +7,7 @@ export type IMessageModel = {
   sender: mongoose.Schema.Types.ObjectId;
   content: string;
   chat: mongoose.Schema.Types.ObjectId;
+  readBy: mongoose.Schema.Types.ObjectId[];
 } & mongoose.Document;
 
 const messageSchema = new mongoose.Schema<IMessageModel>(
@@ -27,6 +28,13 @@ const messageSchema = new mongoose.Schema<IMessageModel>(
       required: [true, "chatId was not provided!"],
       ref: "Chat",
     },
+    readBy: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: [],
+      },
+    ],
   },
   {
     timestamps: true,
