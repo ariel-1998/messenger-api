@@ -39,6 +39,8 @@ export const sendMessage = expressAsyncHandler(
       await ChatModel.findByIdAndUpdate(chatId, {
         latestMessage: message,
       });
+      console.log("sendMessage");
+
       res.status(200).json(message);
     } catch (error) {
       next(DBErrorHandler.handle(error));
@@ -64,6 +66,8 @@ export const getAllMessagesByChatId = expressAsyncHandler(
       //     path: "chat",
       //     populate: { path: "users", select: "-password" },
       //   });
+      console.log("getMessage");
+
       res.status(200).json(messages);
     } catch (error) {
       next(new DynamicError("Server Error!", 500));
@@ -88,8 +92,10 @@ export const getAllUnreadMessages = expressAsyncHandler(
       const unreadMessages = await MessageModel.find({
         chat: { $in: chatsArr }, // Find messages where chat is in chatsArr
         sender: { $ne: userId }, // Sender is not equal to userId
-        readBy: { $elemMatch: { $eq: userId } },
-      });
+        readBy: { $nin: [userId] },
+      })
+        .populate("sender", "name image _id")
+        .populate("chat");
       res.status(200).json(unreadMessages);
     } catch (error) {
       next(new DynamicError("Server Error!", 500));
@@ -104,7 +110,7 @@ export const updateReadBy = expressAsyncHandler(
       messages: string[];
       chatId: string;
     };
-    console.log(req.body);
+    console.log("readby");
 
     if (!messages || !chatId.trim()) {
       return next(new DynamicError("Messages or chatId were not provided!"));
@@ -137,7 +143,7 @@ export const updateReadBy = expressAsyncHandler(
           $addToSet: { readBy: readyByUserId },
         }
       );
-      res.json(read);
+      res.sendStatus(200);
     } catch (error) {
       next(new DynamicError("Server Error!", 500));
     }
