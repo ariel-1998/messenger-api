@@ -26,15 +26,11 @@ export const sendMessage = expressAsyncHandler(
 
     try {
       let message = await MessageModel.create(newMsg);
-      message = await message.populate("sender", "name image _id");
-      message = await message.populate("chat");
-      //check if need to populate users, (in the video its with populated users)!!!
-      //   let message = await MessageModel.create(newMsg);
-      //   message = await message.populate("sender", "name image");
-      //   message = await message.populate({
-      //     path: "chat",
-      //     populate: { path: "users", select: "-password" },
-      //   });
+      message = await message.populate("sender", "name image");
+      message = await message.populate({
+        path: "chat",
+        populate: { path: "users", select: "-password" },
+      });
 
       await ChatModel.findByIdAndUpdate(chatId, {
         latestMessage: message,
@@ -58,16 +54,10 @@ export const getAllMessagesByChatId = expressAsyncHandler(
         chat: chatId,
       })
         .populate("sender", "-password")
-        .populate("chat");
-      //check if need to populate users, (in the video its with NOOOO populated users)!!!
-      //   const messages = await MessageModel.find({
-      //     chat: chatId,
-      //   }).populate("sender", "-password").populate({
-      //     path: "chat",
-      //     populate: { path: "users", select: "-password" },
-      //   });
-      console.log("getMessage");
-
+        .populate({
+          path: "chat",
+          populate: { path: "users", select: "-password" },
+        });
       res.status(200).json(messages);
     } catch (error) {
       next(new DynamicError("Server Error!", 500));
@@ -90,12 +80,15 @@ export const getAllUnreadMessages = expressAsyncHandler(
 
     try {
       const unreadMessages = await MessageModel.find({
-        chat: { $in: chatsArr }, // Find messages where chat is in chatsArr
-        sender: { $ne: userId }, // Sender is not equal to userId
+        chat: { $in: chatsArr },
+        sender: { $ne: userId },
         readBy: { $nin: [userId] },
       })
         .populate("sender", "name image _id")
-        .populate("chat");
+        .populate({
+          path: "chat",
+          populate: { path: "users", select: "-password" },
+        });
       res.status(200).json(unreadMessages);
     } catch (error) {
       next(new DynamicError("Server Error!", 500));
@@ -129,7 +122,7 @@ export const updateReadBy = expressAsyncHandler(
       const isUserExistInChat = chat.users.find(
         (id) => id.toString() === readyByUserId.toString()
       );
-      //check if user is in chat
+
       if (!isUserExistInChat) {
         return next(new DynamicError("User is not part of this chat!", 403));
       }

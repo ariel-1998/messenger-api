@@ -39,7 +39,6 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   //create a room for each user that connects
-
   socket.on("setup", (userId: string) => {
     socket.join(userId);
     socket.emit("setup", true);
@@ -58,35 +57,24 @@ io.on("connection", (socket) => {
   //connectes user to a specific room, based on the chatId
   socket.on("joinChat", (chatId: string) => {
     socket.join(chatId);
-    socket.emit("joinChat", chatId);
-    console.log("join", chatId);
   });
 
   // disconnect user when leaves the room
   socket.on("leaveChat", (chatId: string) => {
-    socket.emit("leaveChat", null);
     socket.leave(chatId);
   });
 
+  socket.on("typing", (user: IUserModel, chatId) => {
+    socket.broadcast.to(chatId).emit("typing", user.name);
+  });
   //sending the message to all users that are connected to a specific room, excluding the sender himself
   socket.on("message", (message: SocketMessageModel) => {
     try {
       const { chat } = message;
-
-      //i dont use brodcast if someone leaves the groupChat i only want the the ones
-      //that are still in the group to get the message, and not who is in the room but left the group
       chat.users.forEach((userId) => {
         if (userId === message.sender._id) return;
-        // socket.in(userId).emit("message", message);
-        socket.in(userId).emit("message", message);
+        socket.to(userId).emit("message", message);
       });
-      console.log("messaged", message);
-
-      // chat.users.forEach((userId) => {
-      //   if (userId === message.sender._id) return;
-      //   socket.in(userId).emit("message", message);
-      // });
-      // socket.broadcast.to(chat._id).emit("message", message);
     } catch (error) {
       console.log(error.message);
     }
