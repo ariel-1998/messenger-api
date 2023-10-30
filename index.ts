@@ -71,10 +71,11 @@ io.on("connection", (socket) => {
   socket.on("message", (message: SocketMessageModel) => {
     try {
       const { chat } = message;
-      chat.users.forEach((userId) => {
-        if (userId === message.sender._id) return;
-        socket.to(userId).emit("message", message);
+      chat.users.forEach((user) => {
+        if (user._id === message.sender._id) return;
+        socket.to(user._id).emit("message", message);
       });
+      console.log(message);
     } catch (error) {
       console.log(error.message);
     }

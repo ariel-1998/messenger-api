@@ -148,8 +148,11 @@ export const renameGroup = expressAsyncHandler(
         { new: true }
       )
         .populate("users", "-password")
-        .populate("groupAdmin", "-password");
-
+        .populate("groupAdmin", "-password")
+        .populate({
+          path: "latestMessage",
+          populate: { path: "sender", select: "-password" },
+        });
       res.status(200).json(updatedChat);
     } catch (error) {
       next(new DynamicError("Group chat was not found!", 404));
@@ -184,7 +187,11 @@ export const addMembersToGroup = expressAsyncHandler(
         { new: true, runValidators: true }
       )
         .populate("users", "-password")
-        .populate("groupAdmin", "-password");
+        .populate("groupAdmin", "-password")
+        .populate({
+          path: "latestMessage",
+          populate: { path: "sender", select: "-password" },
+        });
 
       if (!updatedGroup) {
         const errorMessage =
@@ -242,9 +249,14 @@ export const removeMembersFromGroup = expressAsyncHandler(
         res.sendStatus(204);
         return;
       }
-      const populatedGroup = await (
-        await updatedGroup.populate("users", "-password")
-      ).populate("groupAdmin", "-password");
+      let populatedGroup = await (
+        await (
+          await updatedGroup.populate("users", "-password")
+        ).populate("groupAdmin", "-password")
+      ).populate({
+        path: "latestMessage",
+        populate: { path: "sender", select: "-password" },
+      });
 
       res.status(200).json(populatedGroup);
     } catch (error) {

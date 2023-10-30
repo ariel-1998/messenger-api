@@ -51,5 +51,5 @@ export type SocketMessageModel = {
   _id: string;
   sender: Omit<IUserModel, "password">;
   content: string;
-  chat: Omit<IChatModel, "users"> & { users: string[] };
+  chat: Omit<IChatModel, "users"> & { users: IUserModel[] };
 };
