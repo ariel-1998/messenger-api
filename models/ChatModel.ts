@@ -9,6 +9,7 @@ export type IChatModel = {
   users: mongoose.Schema.Types.ObjectId[];
   latestMessage: mongoose.Schema.Types.ObjectId;
   groupAdmin: mongoose.Schema.Types.ObjectId;
+  groupImg: string;
 } & mongoose.Document;
 
 const chatSchema = new mongoose.Schema<IChatModel>(
@@ -32,6 +33,11 @@ const chatSchema = new mongoose.Schema<IChatModel>(
     },
     groupAdmin: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     latestMessage: { type: mongoose.Schema.Types.ObjectId, ref: "Message" },
+    groupImg: {
+      type: String,
+      default:
+        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg", ////need to add link
+    },
   },
   {
     timestamps: true,

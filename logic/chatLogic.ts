@@ -71,13 +71,16 @@ export const getAllChats = expressAsyncHandler(
 export const createGroupChat = expressAsyncHandler(
   async (req: CustomReq, res: Response, next: NextFunction) => {
     const jwtUserId = req.user._id as ObjectId;
-    const { users, chatName } = req.body as Pick<
+    const { users, chatName, groupImg } = req.body as Pick<
       IChatModel,
-      "users" | "chatName"
+      "users" | "chatName" | "groupImg"
     >;
 
     if (!users || !chatName.trim()) {
       return next(new DynamicError("users array and chatName are required!"));
+    }
+    if (typeof groupImg !== "string") {
+      return next(new DynamicError("groupImg supposed to be a url string!"));
     }
 
     let usersArr: ObjectId[];
@@ -98,6 +101,7 @@ export const createGroupChat = expressAsyncHandler(
         chatName,
         isGroupChat: true,
         groupAdmin: jwtUserId,
+        groupImg,
         users: [...usersArr, jwtUserId],
       });
 

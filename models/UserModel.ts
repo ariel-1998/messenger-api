@@ -25,7 +25,8 @@ const userSchema = new mongoose.Schema<IUserModel>(
     password: { type: String, required: [true, "Password is required"] },
     image: {
       type: String,
-      default: "asd", //need to add link
+      default:
+        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
     },
   },
   {
