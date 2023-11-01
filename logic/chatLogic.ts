@@ -52,6 +52,7 @@ export const getAllChats = expressAsyncHandler(
       const jwtUserId = req.user._id as ObjectId;
       const chats = await ChatModel.find({
         users: { $elemMatch: { $eq: jwtUserId } },
+        $or: [{ latestMessage: { $exists: true } }, { isGroupChat: true }],
       })
         .populate("users", "-password")
         .populate("groupAdmin", "-password")
@@ -79,9 +80,10 @@ export const createGroupChat = expressAsyncHandler(
     if (!users || !chatName.trim()) {
       return next(new DynamicError("users array and chatName are required!"));
     }
-    if (typeof groupImg !== "string") {
-      return next(new DynamicError("groupImg supposed to be a url string!"));
-    }
+
+    if (groupImg)
+      if (typeof groupImg !== "string")
+        return next(new DynamicError("groupImg supposed to be a url string!"));
 
     let usersArr: ObjectId[];
     try {
