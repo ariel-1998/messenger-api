@@ -1,7 +1,7 @@
 import { Response, NextFunction } from "express";
 import expressAsyncHandler from "express-async-handler";
 import { CustomReq } from "../models/CustomReq";
-import { IUserModel, UserModel } from "../models/UserModel";
+import { UserModel } from "../models/UserModel";
 import { DynamicError } from "../models/ErrorModel";
 import { ObjectId } from "mongoose";
 

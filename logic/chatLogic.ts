@@ -60,7 +60,7 @@ export const getAllChats = expressAsyncHandler(
           path: "latestMessage",
           populate: { path: "sender", select: "-password" },
         })
-        .sort({ updatedAt: -1 }); //need to check if the sort works properly
+        .sort({ updatedAt: -1 });
 
       res.json(chats);
     } catch (error) {
@@ -212,7 +212,6 @@ export const addMembersToGroup = expressAsyncHandler(
   }
 );
 
-//need to return populated group
 export const removeMembersFromGroup = expressAsyncHandler(
   async (req: CustomReq, res: Response, next: NextFunction) => {
     const params = req.params as { groupId: string; userId: string };

@@ -34,7 +34,7 @@ export const loginUser = expressAsyncHandler(
 
     const user = await UserModel.findOne({ email });
     if (user) {
-      const isAuthorized = await user.passwordCompare(password); //need to change any
+      const isAuthorized = await user.passwordCompare(password);
 
       if (isAuthorized) {
         const jwt = createJWT(user);

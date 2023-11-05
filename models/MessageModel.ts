@@ -10,7 +10,7 @@ export type IMessageModel = {
   readBy: mongoose.Schema.Types.ObjectId[];
   frontendTimeStamp: Date;
 } & mongoose.Document;
-//timeStampFromUser is only for ux puposes so i could update messages faster
+
 const messageSchema = new mongoose.Schema<IMessageModel>(
   {
     sender: { type: mongoose.Schema.Types.ObjectId, ref: "User" },

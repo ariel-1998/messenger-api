@@ -1,6 +1,4 @@
 import mongoose from "mongoose";
-import { UserModel } from "./UserModel";
-import { DynamicError } from "./ErrorModel";
 
 export type IChatModel = {
   _id: mongoose.Schema.Types.ObjectId;
@@ -36,7 +34,7 @@ const chatSchema = new mongoose.Schema<IChatModel>(
     groupImg: {
       type: String,
       default:
-        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg", ////need to add link
+        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
     },
   },
   {

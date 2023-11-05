@@ -10,11 +10,8 @@ import { messageRouter } from "./controller/messageRouter";
 import { Server } from "socket.io";
 import { IUserModel } from "./models/UserModel";
 import { IChatModel } from "./models/ChatModel";
-import {
-  MessageModel,
-  SocketChatModel,
-  SocketMessageModel,
-} from "./models/MessageModel";
+import { SocketChatModel, SocketMessageModel } from "./models/MessageModel";
+
 dotenv.config();
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -65,9 +62,11 @@ io.on("connection", (socket) => {
     socket.leave(chatId);
   });
 
+  //tell the room who is typing
   socket.on("typing", (user: IUserModel, chatId) => {
     socket.broadcast.to(chatId).emit("typing", user.name);
   });
+
   //sending the message to all users that are connected to a specific room, excluding the sender himself
   socket.on("message", (message: SocketMessageModel) => {
     try {
@@ -82,6 +81,7 @@ io.on("connection", (socket) => {
     }
   });
 
+  //added to group
   socket.on(
     "addingToGroup",
     (
@@ -100,6 +100,8 @@ io.on("connection", (socket) => {
       }
     }
   );
+
+  //removed from group
   socket.on(
     "removingFromGroup",
     (
@@ -119,6 +121,7 @@ io.on("connection", (socket) => {
     }
   );
 
+  //deleting group
   socket.on(
     "deletingGroup",
     (chat: Omit<IChatModel, "users"> & { users: IUserModel[] }) => {

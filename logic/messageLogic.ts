@@ -1,7 +1,7 @@
 import expressAsyncHandler from "express-async-handler";
 import { CustomReq } from "../models/CustomReq";
 import { NextFunction, Response } from "express";
-import { DBErrorHandler, DynamicError } from "../models/ErrorModel";
+import { DynamicError } from "../models/ErrorModel";
 import { MessageModel } from "../models/MessageModel";
 import { ObjectId } from "mongoose";
 import { ChatModel } from "../models/ChatModel";
