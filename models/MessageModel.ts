@@ -8,8 +8,9 @@ export type IMessageModel = {
   content: string;
   chat: mongoose.Schema.Types.ObjectId;
   readBy: mongoose.Schema.Types.ObjectId[];
+  frontendTimeStamp: Date;
 } & mongoose.Document;
-
+//timeStampFromUser is only for ux puposes so i could update messages faster
 const messageSchema = new mongoose.Schema<IMessageModel>(
   {
     sender: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
@@ -35,9 +36,13 @@ const messageSchema = new mongoose.Schema<IMessageModel>(
         default: [],
       },
     ],
+    frontendTimeStamp: {
+      type: Date,
+      required: [true, "frontendTimeStamp was not provided!"],
+    },
   },
   {
-    timestamps: true,
+    timestamps: false,
     versionKey: false,
   }
 );
@@ -51,5 +56,9 @@ export type SocketMessageModel = {
   _id: string;
   sender: Omit<IUserModel, "password">;
   content: string;
-  chat: Omit<IChatModel, "users"> & { users: IUserModel[] };
+  chat: SocketChatModel;
+};
+
+export type SocketChatModel = Omit<IChatModel, "users"> & {
+  users: IUserModel[];
 };

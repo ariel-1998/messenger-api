@@ -10,7 +10,11 @@ import { messageRouter } from "./controller/messageRouter";
 import { Server } from "socket.io";
 import { IUserModel } from "./models/UserModel";
 import { IChatModel } from "./models/ChatModel";
-import { MessageModel, SocketMessageModel } from "./models/MessageModel";
+import {
+  MessageModel,
+  SocketChatModel,
+  SocketMessageModel,
+} from "./models/MessageModel";
 dotenv.config();
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -31,7 +35,6 @@ const server = app.listen(PORT, () => {
 });
 
 const io = new Server(server, {
-  pingTimeout: 2 * 60 * 1000,
   cors: {
     origin: "*",
   },
@@ -44,15 +47,13 @@ io.on("connection", (socket) => {
     socket.emit("setup", true);
   });
 
-  // socket.on("readMessage", (userId: string) => {
-  //   try {
-  //     socket.join(userId);
-  //     socket.emit("setup", true);
-  //     console.log("setup", userId);
-  //   } catch (error) {
-  //     socket.emit("setup", false);
-  //   }
-  // });
+  //mark messages as read
+  socket.on("readMessage", (chat: SocketChatModel, userId: string) => {
+    chat.users.forEach((user) => {
+      if (user._id === userId) return;
+      socket.to(user._id).emit("readMessage", chat, userId);
+    });
+  });
 
   //connectes user to a specific room, based on the chatId
   socket.on("joinChat", (chatId: string) => {
@@ -80,4 +81,54 @@ io.on("connection", (socket) => {
       console.log(error.message);
     }
   });
+
+  socket.on(
+    "addingToGroup",
+    (
+      group: Omit<IChatModel, "users" | "groupAdmin"> & {
+        users: IUserModel[];
+        groupAdmin: IUserModel;
+      }
+    ) => {
+      try {
+        group.users.forEach((user) => {
+          if (user._id === group._id) return;
+          socket.to(user._id).emit("addedToGroup", group);
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  );
+  socket.on(
+    "removingFromGroup",
+    (
+      newChat: Omit<IChatModel, "users"> & { users: IUserModel[] },
+      userToRemove: IUserModel
+    ) => {
+      try {
+        newChat.users.forEach((user) => {
+          socket.to(user._id).emit("removingFromGroup", newChat, userToRemove);
+        });
+        socket
+          .to(userToRemove._id)
+          .emit("removingFromGroup", newChat, userToRemove);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  );
+
+  socket.on(
+    "deletingGroup",
+    (chat: Omit<IChatModel, "users"> & { users: IUserModel[] }) => {
+      try {
+        chat.users.forEach((user) => {
+          socket.to(user._id).emit("deletingGroup", chat._id);
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  );
 });

@@ -8,23 +8,41 @@ import { ChatModel } from "../models/ChatModel";
 
 export const sendMessage = expressAsyncHandler(
   async (req: CustomReq, res: Response, next: NextFunction) => {
-    const { content, chat: chatId } = req.body as {
+    const {
+      content,
+      chat: chatId,
+      frontendTimeStamp,
+    } = req.body as {
       content: string;
       chat: string;
+      frontendTimeStamp: Date;
     };
     const jwtUserId: ObjectId = req.user._id;
-    if (!content || !chatId) {
-      return next(new DynamicError("Content and chatId are required!"));
-    }
 
     const newMsg = new MessageModel({
       content,
       chat: chatId,
       sender: jwtUserId,
       readBy: [],
+      frontendTimeStamp,
     });
-
+    if (!content || !chatId) {
+      res.status(400).json(newMsg);
+      return;
+    }
     try {
+      const chat = await ChatModel.findById(chatId);
+      if (!chat) {
+        res.status(404).json(newMsg);
+        return;
+      }
+      const userIndex = chat.users.findIndex(
+        (userId) => userId.toString() === jwtUserId.toString()
+      );
+      if (userIndex === -1) {
+        res.status(403).json(newMsg);
+        return;
+      }
       let message = await MessageModel.create(newMsg);
       message = await message.populate("sender", "name image");
       message = await message.populate({
@@ -35,11 +53,10 @@ export const sendMessage = expressAsyncHandler(
       await ChatModel.findByIdAndUpdate(chatId, {
         latestMessage: message,
       });
-      console.log("sendMessage");
 
       res.status(200).json(message);
     } catch (error) {
-      next(DBErrorHandler.handle(error));
+      res.status(500).json(newMsg);
     }
   }
 );
@@ -127,7 +144,7 @@ export const updateReadBy = expressAsyncHandler(
         return next(new DynamicError("User is not part of this chat!", 403));
       }
 
-      const read = await MessageModel.updateMany(
+      await MessageModel.updateMany(
         {
           _id: { $in: messagesArr },
           chat: chatId,
@@ -136,7 +153,8 @@ export const updateReadBy = expressAsyncHandler(
           $addToSet: { readBy: readyByUserId },
         }
       );
-      res.sendStatus(200);
+      const populatedChat = await chat.populate("users");
+      res.status(200).json(populatedChat);
     } catch (error) {
       next(new DynamicError("Server Error!", 500));
     }
