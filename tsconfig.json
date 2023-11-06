@@ -4,6 +4,7 @@
     "target": "ES2022",
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "module": "ES2022"
+    "module": "ESNext",
+    "allowJs": true
   }
 }
