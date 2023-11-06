@@ -2,7 +2,7 @@
   "name": "messenger-server",
   "version": "1.0.0",
   "description": "",
-  "main": "./dist/index.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
     "dev": "nodemon --exec ts-node index.ts",
