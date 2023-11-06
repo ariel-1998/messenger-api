@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { jwtVerification } from "../middleware/jwtVerification";
-import { searchUser } from "../logic/userLogic";
+import { jwtVerification } from "../middleware/jwtVerification.js";
+import { searchUser } from "../logic/userLogic.js";
 
 export const userRouter = Router();
 userRouter.use(jwtVerification);

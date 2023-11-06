@@ -1,5 +1,5 @@
 import { NextFunction, Response, Request } from "express";
-import { ErrorModel } from "../models/ErrorModel";
+import { ErrorModel } from "../models/ErrorModel.js";
 
 export function RouteNotFound(req: Request, res: Response, next: NextFunction) {
   const error = `URL Not Found: ${req.originalUrl}`;

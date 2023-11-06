@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { UserModel } from "../models/UserModel";
-import { loginUser, registerUser } from "../logic/authLogic";
+import { UserModel } from "../models/UserModel.js";
+import { loginUser, registerUser } from "../logic/authLogic.js";
 
 export const authRouter = Router();
 

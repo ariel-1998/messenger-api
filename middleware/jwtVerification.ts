@@ -1,9 +1,9 @@
 import { Response, NextFunction } from "express";
 import expressAsyncHandler from "express-async-handler";
-import { CustomReq } from "../models/CustomReq";
+import { CustomReq } from "../models/CustomReq.js";
 import jwt, { decode } from "jsonwebtoken";
-import { IUserModel, UserModel } from "../models/UserModel";
-import { DynamicError } from "../models/ErrorModel";
+import { IUserModel, UserModel } from "../models/UserModel.js";
+import { DynamicError } from "../models/ErrorModel.js";
 
 export const jwtVerification = expressAsyncHandler(
   async (req: CustomReq, res: Response, next: NextFunction) => {

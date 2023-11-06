@@ -1,5 +1,5 @@
 import { ObjectId } from "mongoose";
-import { UserModel } from "../models/UserModel";
+import { UserModel } from "../models/UserModel.js";
 
 export const validateUsersArr = async (usersArr: ObjectId[]) => {
   try {

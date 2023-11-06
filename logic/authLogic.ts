@@ -1,9 +1,9 @@
 import expressAsyncHandler from "express-async-handler";
-import { createJWT } from "../utils/createJWT";
-import { DynamicError, MongoErrorModel } from "../models/ErrorModel";
-import { IUserModel, UserModel } from "../models/UserModel";
+import { createJWT } from "../utils/createJWT.js";
+import { DynamicError, MongoErrorModel } from "../models/ErrorModel.js";
+import { IUserModel, UserModel } from "../models/UserModel.js";
 import { NextFunction, Response, Request } from "express";
-import { CredentialsModel } from "../models/CredentialsModel";
+import { CredentialsModel } from "../models/CredentialsModel.js";
 
 export const registerUser = expressAsyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {

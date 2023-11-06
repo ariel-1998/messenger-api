@@ -1,10 +1,10 @@
 import expressAsyncHandler from "express-async-handler";
-import { CustomReq } from "../models/CustomReq";
+import { CustomReq } from "../models/CustomReq.js";
 import { NextFunction, Response } from "express";
-import { DynamicError } from "../models/ErrorModel";
-import { MessageModel } from "../models/MessageModel";
+import { DynamicError } from "../models/ErrorModel.js";
+import { MessageModel } from "../models/MessageModel.js";
 import { ObjectId } from "mongoose";
-import { ChatModel } from "../models/ChatModel";
+import { ChatModel } from "../models/ChatModel.js";
 
 export const sendMessage = expressAsyncHandler(
   async (req: CustomReq, res: Response, next: NextFunction) => {
