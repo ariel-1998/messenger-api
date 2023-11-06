@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "target": "ES6",
-    "noEmit": true,
-    "moduleResolution": "Node10",
+    "target": "es2022",
+    "moduleResolution": "node",
     "module": "es6",
     "outDir": "./dist",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "rootDir": "."
   }
 }
