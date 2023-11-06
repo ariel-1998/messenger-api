@@ -1,7 +1,10 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "moduleResolution": "Node16",
+    "module": "Node16",
     "outDir": "./dist",
     "esModuleInterop": true,
     "resolveJsonModule": true

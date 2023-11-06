@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { jwtVerification } from "../middleware/jwtVerification";
+import { jwtVerification } from "../middleware/jwtVerification.ts";
 import {
   getAllMessagesByChatId,
   getAllUnreadMessages,
   sendMessage,
   updateReadBy,
-} from "../logic/messageLogic";
+} from "../logic/messageLogic.ts";
 
 export const messageRouter = Router();
 messageRouter.use(jwtVerification);

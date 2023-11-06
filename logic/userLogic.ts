@@ -1,8 +1,8 @@
 import { Response, NextFunction } from "express";
 import expressAsyncHandler from "express-async-handler";
-import { CustomReq } from "../models/CustomReq";
-import { UserModel } from "../models/UserModel";
-import { DynamicError } from "../models/ErrorModel";
+import { CustomReq } from "../models/CustomReq.ts";
+import { UserModel } from "../models/UserModel.ts";
+import { DynamicError } from "../models/ErrorModel.ts";
 import { ObjectId } from "mongoose";
 
 export const searchUser = expressAsyncHandler(

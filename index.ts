@@ -1,16 +1,16 @@
 import express, { json } from "express";
 import * as dotenv from "dotenv";
-import { connectToDB } from "./utils/DB";
-import { authRouter } from "./controller/authRouter";
-import { RouteNotFound, errorHandler } from "./middleware/errorMiddleware";
+import { connectToDB } from "./utils/DB.ts";
+import { authRouter } from "./controller/authRouter.ts";
+import { RouteNotFound, errorHandler } from "./middleware/errorMiddleware.ts";
 import cors from "cors";
-import { userRouter } from "./controller/userRouter";
-import { chatRouter } from "./controller/chatRouter";
-import { messageRouter } from "./controller/messageRouter";
+import { userRouter } from "./controller/userRouter.ts";
+import { chatRouter } from "./controller/chatRouter.ts";
+import { messageRouter } from "./controller/messageRouter.ts";
 import { Server } from "socket.io";
-import { IUserModel } from "./models/UserModel";
-import { IChatModel } from "./models/ChatModel";
-import { SocketChatModel, SocketMessageModel } from "./models/MessageModel";
+import { IUserModel } from "./models/UserModel.ts";
+import { IChatModel } from "./models/ChatModel.ts";
+import { SocketChatModel, SocketMessageModel } from "./models/MessageModel.ts";
 
 dotenv.config();
 const PORT = process.env.PORT || 3001;

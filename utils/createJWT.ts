@@ -1,4 +1,4 @@
-import { IUserModel } from "../models/UserModel";
+import { IUserModel } from "../models/UserModel.ts";
 import jwt from "jsonwebtoken";
 
 export function createJWT(user: IUserModel) {
