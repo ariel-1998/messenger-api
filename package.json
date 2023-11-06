@@ -2,11 +2,11 @@
   "name": "messenger-server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.mjs",
+  "main": "./dist/index.js",
   "type": "module",
   "scripts": {
     "dev": "nodemon --exec ts-node index.ts",
-    "start": "node dist/index.mjs",
+    "start": "node ./dist/index.js",
     "build": "tsc"
   },
   "keywords": [],
