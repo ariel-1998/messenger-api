@@ -21,8 +21,8 @@ app.use(
     origin: process.env.CORS_URL,
   })
 );
+
 app.use(json());
-app.get("/", (req, res) => res.json("hello"));
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/chat", chatRouter);
