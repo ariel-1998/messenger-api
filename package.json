@@ -5,10 +5,8 @@
   "main": "index.mjs",
   "type": "module",
   "scripts": {
-    "dev": "nodemon --exec ts-node index.ts",
     "start": "node dist/index.mjs",
-    "build": "tsc",
-    "postinstall": "npm run build"
+    "postinstall": "tsc"
   },
   "engines": {
     "node": "19.0.0"
