@@ -1,8 +1,10 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
+    "outDir": "dist",
     "target": "ES2022",
     "esModuleInterop": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "lib": ["esnext"]
   }
 }
