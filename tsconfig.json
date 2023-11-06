@@ -2,10 +2,9 @@
   "compilerOptions": {
     "outDir": "dist",
     "target": "ES2022",
-    "esModuleInterop": true,
-    "moduleResolution": "node",
     "module": "ESNext",
-    "noEmit": true,
-    "allowImportingTsExtensions": true
+    "allowJs": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node"
   }
 }
