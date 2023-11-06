@@ -18,7 +18,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://jade-tapioca-2f148a.netlify.app",
+    origin: process.env.CORS_URL,
   })
 );
 app.use(json());
