@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "moduleResolution": "NodeNext",
     "target": "ES2022",
     "module": "CommonJS",
     "outDir": "./dist",
