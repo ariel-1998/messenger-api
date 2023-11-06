@@ -3,6 +3,9 @@
     "outDir": "dist",
     "target": "ES2022",
     "esModuleInterop": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "module": "ESNext",
+    "noEmit": true,
+    "allowImportingTsExtensions": true
   }
 }
