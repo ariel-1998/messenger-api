@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { IUserModel } from "./UserModel.js";
-import { IChatModel } from "./ChatModel.js";
+import { IUserModel } from "./UserModel";
+import { IChatModel } from "./ChatModel";
 
 export type IMessageModel = {
   _id: mongoose.Schema.Types.ObjectId;

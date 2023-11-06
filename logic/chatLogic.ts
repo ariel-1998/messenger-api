@@ -1,11 +1,11 @@
 import expressAsyncHandler from "express-async-handler";
-import { CustomReq } from "../models/CustomReq.js";
+import { CustomReq } from "../models/CustomReq";
 import { NextFunction, Response } from "express";
-import { DynamicError, DBErrorHandler } from "../models/ErrorModel.js";
-import { ChatModel, IChatModel } from "../models/ChatModel.js";
-import { validateUsersArr } from "../utils/logicDBChecks.js";
+import { DynamicError, DBErrorHandler } from "../models/ErrorModel";
+import { ChatModel, IChatModel } from "../models/ChatModel";
+import { validateUsersArr } from "../utils/logicDBChecks";
 import { ObjectId } from "mongoose";
-import { UserModel } from "../models/UserModel.js";
+import { UserModel } from "../models/UserModel";
 
 export const accessChat = expressAsyncHandler(
   async (req: CustomReq, res: Response, next: NextFunction) => {

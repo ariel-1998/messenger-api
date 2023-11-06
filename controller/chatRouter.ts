@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { jwtVerification } from "../middleware/jwtVerification.js";
+import { jwtVerification } from "../middleware/jwtVerification";
 import {
   accessChat,
   addMembersToGroup,
@@ -8,7 +8,7 @@ import {
   getAllChats,
   removeMembersFromGroup,
   renameGroup,
-} from "../logic/chatLogic.js";
+} from "../logic/chatLogic";
 
 export const chatRouter = Router();
 
