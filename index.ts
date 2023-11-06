@@ -16,7 +16,11 @@ dotenv.config();
 const PORT = process.env.PORT || 3001;
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://jade-tapioca-2f148a.netlify.app",
+  })
+);
 app.use(json());
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
