@@ -6,6 +6,5 @@ export const connectToDB = async () => {
     console.log(`Connected to DB: ${connect.connection.host}`);
   } catch (error) {
     console.log(`Error: ${error.message}`);
-    process.exit();
   }
 };

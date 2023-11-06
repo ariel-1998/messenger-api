@@ -29,7 +29,7 @@ app.use("/api/user", userRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/message", messageRouter);
 
-app.use("/", RouteNotFound);
+app.use("*", RouteNotFound);
 app.use(errorHandler);
 
 const server = app.listen(PORT, () => {
