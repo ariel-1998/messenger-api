@@ -12,6 +12,9 @@
   "engines": {
     "node": "19.0.0"
   },
+  "ts-node": {
+    "esm": true
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
