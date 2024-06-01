@@ -27,6 +27,7 @@ export const registerUser = expressAsyncHandler(
 
       res.status(201).json(jwt);
     } catch (error) {
+      console.log(error);
       next(new DynamicError("Server Error.", 500));
     }
   }
@@ -39,9 +40,9 @@ export const loginUser = expressAsyncHandler(
       return next(new DynamicError("Email or password were not provided", 400));
     try {
       const user = await UserModel.findOne({ email });
+      console.log(user);
       if (user) {
         const isAuthorized = await user.passwordCompare(password);
-        console.log("isAuthorized", isAuthorized);
         if (isAuthorized) {
           const jwt = createJWT(user);
           return res.status(200).json(jwt);
@@ -49,7 +50,6 @@ export const loginUser = expressAsyncHandler(
       }
       next(new DynamicError("Email or password are incorrect", 401));
     } catch (error) {
-      console.log("error", error);
       next(new DynamicError("Server Error.", 500));
     }
   }

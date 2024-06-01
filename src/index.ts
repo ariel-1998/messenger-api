@@ -1,37 +1,15 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import express, { json } from "express";
 import { connectToDB } from "./utils/DB";
-import { authRouter } from "./controller/authRouter";
-import { RouteNotFound, errorHandler } from "./middleware/errorMiddleware";
-import cors from "cors";
-import { userRouter } from "./controller/userRouter";
-import { chatRouter } from "./controller/chatRouter";
-import { messageRouter } from "./controller/messageRouter";
+
 import { Server } from "socket.io";
 import { IUserModel } from "./models/UserModel";
 import { IChatModel } from "./models/ChatModel";
 import { SocketChatModel, SocketMessageModel } from "./models/MessageModel";
+import app from "./app";
 
 const PORT = process.env.PORT;
-const app = express();
-
-app.use(
-  cors({
-    origin: process.env.CORS_URL,
-    methods: "POST,GET,PUT,DELETE",
-  })
-);
-
-app.use(json());
-app.use("/api/auth", authRouter);
-app.use("/api/user", userRouter);
-app.use("/api/chat", chatRouter);
-app.use("/api/message", messageRouter);
-
-app.use("*", RouteNotFound);
-app.use(errorHandler);
 
 const server = app.listen(PORT, () => {
   console.log(`listenning on port ${PORT}`);
