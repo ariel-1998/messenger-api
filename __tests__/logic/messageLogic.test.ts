@@ -390,7 +390,7 @@ describe("messageLogic", () => {
       expect(nextFn).toHaveBeenCalledTimes(1);
       expect(nextFn).toHaveBeenCalledWith(expectedErr);
     });
-    it("should call next with error when chatId can be trimed to nullish value", () => {
+    it("should call next with error when chatId can be trimmed to nullish value", () => {
       request.body.chatId = "   ";
       const expectedErr = new DynamicError("chatId was not provided!");
       updateReadBy(request, response, nextFn);

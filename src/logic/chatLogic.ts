@@ -26,10 +26,7 @@ export const accessChat = expressAsyncHandler(
           path: "latestMessage",
           populate: { path: "sender", select: "-password" },
         });
-      if (chat) {
-        res.status(200).json(chat);
-        return;
-      }
+      if (chat) return res.status(200).json(chat);
       const newChatData = new ChatModel({
         chatName: "null",
         isGroupChat: false,
@@ -39,6 +36,7 @@ export const accessChat = expressAsyncHandler(
       const poplateNewChat = await createdChat.populate("users", "-password");
       res.status(200).json(poplateNewChat);
     } catch (error) {
+      console.log(error);
       next(new DynamicError("Server Error!", 500));
     }
   }
@@ -144,18 +142,19 @@ export const renameGroup = expressAsyncHandler(
     const { groupId } = req.params as { groupId: string };
     const { chatName } = req.body as Pick<IChatModel, "chatName">;
     const jwtUserId = req.user._id as ObjectId;
+    console.log`groupId ${groupId}`;
+    console.log`chatName ${chatName}`;
     try {
       if (!chatName || typeof chatName !== "string" || !chatName.trim()) {
         return next(new DynamicError("chatName is required!"));
       }
-
       const updatedChat = await ChatModel.findOneAndUpdate(
         {
           _id: groupId,
           users: { $elemMatch: { $eq: jwtUserId } },
         },
         { chatName },
-        { new: true }
+        { return: true }
       )
         .populate("users", "-password")
         .populate("groupAdmin", "-password")
@@ -163,6 +162,7 @@ export const renameGroup = expressAsyncHandler(
           path: "latestMessage",
           populate: { path: "sender", select: "-password" },
         });
+      console.log(updatedChat);
       res.status(200).json(updatedChat);
     } catch (error) {
       next(new DynamicError("Group chat was not found!", 404));
@@ -174,7 +174,7 @@ export const addMembersToGroup = expressAsyncHandler(
   async (req: CustomReq, res: Response, next: NextFunction) => {
     const { groupId } = req.params as { groupId: string };
     const jwtUserId = req.user._id as ObjectId;
-    const { users } = req.body;
+    const { users } = req.body as { users: string[] };
     // let usersArr: ObjectId[];
 
     // try {
@@ -231,10 +231,9 @@ export const removeMembersFromGroup = expressAsyncHandler(
 
     try {
       isGroup = await ChatModel.findById(groupId);
-      if (!isGroup) return next(new DynamicError("Group chat was not found!"));
+      if (!isGroup) throw Error();
     } catch (error) {
-      console.log("error1", error);
-      return next(new DynamicError("Group chat was not found!", 400));
+      return next(new DynamicError("Group chat was not found!", 404));
     }
     //verify its an admin or user trying to remove himself
     if (userId !== jwtUserId.toString()) {
@@ -275,8 +274,6 @@ export const removeMembersFromGroup = expressAsyncHandler(
 
       res.status(200).json(populatedGroup);
     } catch (error) {
-      console.log("error2", error);
-
       next(new DynamicError("Server Error!", 500));
     }
   }

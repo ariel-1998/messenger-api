@@ -3,8 +3,18 @@ import app from "../../src/app";
 import { IUserModel, UserModel } from "../../src/models/UserModel";
 import "../controllerSetup";
 import { CredentialsModel } from "../../src/models/CredentialsModel";
+import mongoose from "mongoose";
 
 const baseUrl = "/api/auth";
+
+afterEach(async () => {
+  const collections = mongoose.connection.collections;
+  for (const key in collections) {
+    const collection = collections[key];
+    await collection.deleteMany();
+  }
+});
+
 describe("authController", () => {
   describe("registration", () => {
     const path = `${baseUrl}/register`;

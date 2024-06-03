@@ -1,11 +1,7 @@
 import expressAsyncHandler from "express-async-handler";
 import { CustomReq } from "../models/CustomReq";
 import { NextFunction, Response } from "express";
-import {
-  DBErrorHandler,
-  DynamicError,
-  MongoErrorModel,
-} from "../models/ErrorModel";
+import { DBErrorHandler, DynamicError } from "../models/ErrorModel";
 import { IMessageModel, MessageModel } from "../models/MessageModel";
 import mongoose, { ObjectId, startSession } from "mongoose";
 import { ChatModel } from "../models/ChatModel";
@@ -32,7 +28,7 @@ export const sendMessage = expressAsyncHandler(
       frontendTimeStamp,
     });
 
-    if (!content || !chatId)
+    if (!content || typeof content !== "string" || !content.trim() || !chatId)
       return next(new DynamicError("Content or chat are invalid", 400));
 
     try {
@@ -69,6 +65,7 @@ export const sendMessage = expressAsyncHandler(
       await session.commitTransaction();
       res.status(200).json(message);
     } catch (error) {
+      console.log(error);
       try {
         await session?.abortTransaction();
       } catch (error) {}
@@ -120,14 +117,8 @@ export const getAllUnreadMessages = expressAsyncHandler(
     const userId: ObjectId = req.user._id;
     const { chats } = req.body as { chats: string[] };
     try {
-      // let chatsArr: string[];
-      // try {
       if (!chats || !Array.isArray(chats))
         return next(new DynamicError("Chats Array was not provided!"));
-
-      // chatsArr = JSON.parse(chats.toString());
-      // } catch (error) {
-      // }
 
       const unreadMessages = await MessageModel.find({
         chat: { $in: chats },
@@ -157,17 +148,8 @@ export const updateReadBy = expressAsyncHandler(
     try {
       if (!chatId || typeof chatId !== "string" || !chatId.trim())
         return next(new DynamicError("chatId was not provided!"));
-      // let messagesArr: string[];
-
-      // try {
       if (!messages || !Array.isArray(messages) || !messages.length)
         return next(new DynamicError("Messages were not provided!"));
-
-      // messagesArr = JSON.parse(messages.toString());
-      // if (!messagesArr.length) throw new Error();
-      // } catch (error) {
-      // return next(new DynamicError("Messages were not provided!"));
-      // }
 
       const chat = await ChatModel.findById(chatId);
       if (!chat) return next(new DynamicError("Chat was not found", 404));

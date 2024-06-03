@@ -1,12 +1,14 @@
-import { MongoMemoryServer } from "mongodb-memory-server";
+import { MongoMemoryReplSet, MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
-import app from "../src/app";
 
-let mongoServer: MongoMemoryServer;
-let server;
+let mongoServer: MongoMemoryReplSet;
+// let mongoServer: MongoMemoryServer;
 process.env.JWT_SECRET = "someSecret";
 beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
+  mongoServer = await MongoMemoryReplSet.create({
+    replSet: { count: 1 },
+  });
+  // mongoServer = await MongoMemoryServer.create();
   const uri = mongoServer.getUri();
   await mongoose.connect(uri);
 });
@@ -17,18 +19,18 @@ afterAll(async () => {
   await mongoServer.stop();
 });
 
-afterEach(async () => {
-  const collections = mongoose.connection.collections;
-  for (const key in collections) {
-    const collection = collections[key];
-    await collection.deleteMany();
-  }
-});
+// afterEach(async () => {
+//   const collections = mongoose.connection.collections;
+//   for (const key in collections) {
+//     const collection = collections[key];
+//     await collection.deleteMany();
+//   }
+// });
 
-beforeAll((done) => {
-  server = app.listen(3000, done);
-});
+// beforeAll((done) => {
+//   server = app.listen(3000, done);
+// });
 
-afterAll((done) => {
-  server.close(done);
-});
+// afterAll((done) => {
+//   server.close(done);
+// });

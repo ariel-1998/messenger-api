@@ -245,7 +245,7 @@ describe("chatLogic", () => {
       expect(nextFn).toHaveBeenCalledTimes(1);
       expect(nextFn).toHaveBeenCalledWith(expectedErr);
     });
-    it("should call next with error if chatName can be trimed to nullish value", () => {
+    it("should call next with error if chatName can be trimmed to nullish value", () => {
       request.body.chatName = "    ";
       const expectedErr = new DynamicError(
         "users array and chatName are required!"
@@ -381,7 +381,7 @@ describe("chatLogic", () => {
       expect(nextFn).toHaveBeenCalledTimes(1);
       expect(nextFn).toHaveBeenCalledWith(expectedErr);
     });
-    it("should call next with error if chatName can be trimed to nullish value", () => {
+    it("should call next with error if chatName can be trimmed to nullish value", () => {
       const expectedErr = new DynamicError("chatName is required!");
       request.body.chatName = "   ";
       renameGroup(request, response, nextFn);
@@ -527,14 +527,14 @@ describe("chatLogic", () => {
       (ChatModel.findById as jest.Mock).mockResolvedValue(mockFindByIdResults);
     });
     it("should call next with error when findById throws an error", async () => {
-      const expectedErr = new DynamicError("Group chat was not found!", 400);
+      const expectedErr = new DynamicError("Group chat was not found!", 404);
       (ChatModel.findById as jest.Mock).mockRejectedValueOnce("someError");
       await removeMembersFromGroup(request, response, nextFn);
       expect(nextFn).toHaveBeenCalledTimes(1);
       expect(nextFn).toHaveBeenCalledWith(expectedErr);
     });
     it("should call next with error when findById return null", async () => {
-      const expectedErr = new DynamicError("Group chat was not found!");
+      const expectedErr = new DynamicError("Group chat was not found!", 404);
       (ChatModel.findById as jest.Mock).mockResolvedValueOnce(null);
       await removeMembersFromGroup(request, response, nextFn);
       expect(nextFn).toHaveBeenCalledTimes(1);
