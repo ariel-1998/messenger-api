@@ -310,7 +310,6 @@ describe("messageLogic", () => {
   describe("getAllUnreadMessages", () => {
     const messages = [message];
     beforeEach(() => {
-      request.body.chats = [chat._id];
       (MessageModel.find as jest.Mock).mockImplementation(() => {
         const secondPopulate = jest.fn().mockResolvedValue(messages);
         const firstPopulate = jest
@@ -318,18 +317,19 @@ describe("messageLogic", () => {
           .mockReturnValue({ populate: secondPopulate });
         return { populate: firstPopulate };
       });
+      (ChatModel.find as jest.Mock).mockResolvedValue([chat]);
     });
-    it("should next with error when chats is nullish", () => {
-      request.body.chats = null;
-      const expectedErr = new DynamicError("Chats Array was not provided!");
-      getAllUnreadMessages(request, response, nextFn);
+    it("should call next with error when ChatModel.find throws an error", async () => {
+      (ChatModel.find as jest.Mock).mockRejectedValueOnce("someError");
+      const expectedErr = new DynamicError("Server Error!", 500);
+      await getAllUnreadMessages(request, response, nextFn);
       expect(nextFn).toHaveBeenCalledTimes(1);
       expect(nextFn).toHaveBeenCalledWith(expectedErr);
     });
-    it("should next with error when chats is not an array", () => {
-      request.body.chats = "notAnArray";
-      const expectedErr = new DynamicError("Chats Array was not provided!");
-      getAllUnreadMessages(request, response, nextFn);
+    it("should call next with error when ChatModel.find return an empty array", async () => {
+      (ChatModel.find as jest.Mock).mockResolvedValueOnce([]);
+      const expectedErr = new DynamicError("Chats were not found", 404);
+      await getAllUnreadMessages(request, response, nextFn);
       expect(nextFn).toHaveBeenCalledTimes(1);
       expect(nextFn).toHaveBeenCalledWith(expectedErr);
     });
@@ -393,27 +393,6 @@ describe("messageLogic", () => {
     it("should call next with error when chatId can be trimmed to nullish value", () => {
       request.body.chatId = "   ";
       const expectedErr = new DynamicError("chatId was not provided!");
-      updateReadBy(request, response, nextFn);
-      expect(nextFn).toHaveBeenCalledTimes(1);
-      expect(nextFn).toHaveBeenCalledWith(expectedErr);
-    });
-    it("should call next with error when messages is nullish", () => {
-      request.body.messages = null;
-      const expectedErr = new DynamicError("Messages were not provided!");
-      updateReadBy(request, response, nextFn);
-      expect(nextFn).toHaveBeenCalledTimes(1);
-      expect(nextFn).toHaveBeenCalledWith(expectedErr);
-    });
-    it("should call next with error when messages is not an array", () => {
-      request.body.messages = "notAnArray";
-      const expectedErr = new DynamicError("Messages were not provided!");
-      updateReadBy(request, response, nextFn);
-      expect(nextFn).toHaveBeenCalledTimes(1);
-      expect(nextFn).toHaveBeenCalledWith(expectedErr);
-    });
-    it("should call next with error when messages array is empty", () => {
-      request.body.messages = [];
-      const expectedErr = new DynamicError("Messages were not provided!");
       updateReadBy(request, response, nextFn);
       expect(nextFn).toHaveBeenCalledTimes(1);
       expect(nextFn).toHaveBeenCalledWith(expectedErr);

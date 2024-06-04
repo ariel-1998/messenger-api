@@ -111,17 +111,24 @@ export const getAllMessagesByChatId = expressAsyncHandler(
     }
   }
 );
-
+//this is the only thing i need to change in tests
 export const getAllUnreadMessages = expressAsyncHandler(
   async (req: CustomReq, res: Response, next: NextFunction) => {
     const userId: ObjectId = req.user._id;
-    const { chats } = req.body as { chats: string[] };
+    // const { chats } = req.body as { chats: string[] };
+    //might not need chats but instead get all chats by the users inside chat users array
+    //and then get all unread messages by those chats, that way there is no need for checking if part of chat
     try {
-      if (!chats || !Array.isArray(chats))
-        return next(new DynamicError("Chats Array was not provided!"));
+      const userChats = await ChatModel.find({ users: userId });
+      if (!userChats.length)
+        return next(new DynamicError("Chats were not found", 404));
+
+      const chatIds: ObjectId[] = userChats.map((chat) => chat._id);
+      // if (!chats || !Array.isArray(chats))
+      //   return next(new DynamicError("Chats Array was not provided!"));
 
       const unreadMessages = await MessageModel.find({
-        chat: { $in: chats },
+        chat: { $in: chatIds },
         sender: { $ne: userId },
         readBy: { $nin: [userId] },
       })
@@ -141,15 +148,15 @@ export const getAllUnreadMessages = expressAsyncHandler(
 export const updateReadBy = expressAsyncHandler(
   async (req: CustomReq, res: Response, next: NextFunction) => {
     const readyByUserId: ObjectId = req.user._id;
-    const { messages, chatId } = req.body as {
-      messages: string[];
+    const { chatId } = req.body as {
+      // messages: string[];
       chatId: unknown;
     };
     try {
       if (!chatId || typeof chatId !== "string" || !chatId.trim())
         return next(new DynamicError("chatId was not provided!"));
-      if (!messages || !Array.isArray(messages) || !messages.length)
-        return next(new DynamicError("Messages were not provided!"));
+      // if (!messages || !Array.isArray(messages) || !messages.length)
+      // return next(new DynamicError("Messages were not provided!"));
 
       const chat = await ChatModel.findById(chatId);
       if (!chat) return next(new DynamicError("Chat was not found", 404));
@@ -162,8 +169,9 @@ export const updateReadBy = expressAsyncHandler(
 
       await MessageModel.updateMany(
         {
-          _id: { $in: messages },
           chat: chatId,
+          sender: { $ne: readyByUserId },
+          readBy: { $nin: [readyByUserId] },
         },
         {
           $addToSet: { readBy: readyByUserId },

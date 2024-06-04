@@ -157,7 +157,7 @@ describe("messageRouter", () => {
         frontendTimeStamp: new Date(),
       });
       await MessageModel.create([newMsg1, newMsg2]);
-      path = `${baseUrl}/${chat._id}`;
+      path = `${baseUrl}/chat/${chat._id}`;
     });
     afterAll(async () => {
       const collections = mongoose.connection.collections;
@@ -175,7 +175,7 @@ describe("messageRouter", () => {
     });
     it("should responsd with an error when chat was not found", async () => {
       const response = await request(app)
-        .get(`${baseUrl}/${new mongoose.Types.ObjectId()}`)
+        .get(`${baseUrl}/chat/${new mongoose.Types.ObjectId()}`)
         .set("Authorization", authedUserJwt);
       expect(response.status).toBe(404);
       expect(response.body).toStrictEqual({
@@ -203,7 +203,6 @@ describe("messageRouter", () => {
   });
   describe("getAllUnreadMessages", () => {
     const path = `${baseUrl}/unread`;
-    let body: { chats: string[] };
     beforeAll(async () => {
       const newMsg1 = new MessageModel({
         content: "someContent",
@@ -220,49 +219,43 @@ describe("messageRouter", () => {
         frontendTimeStamp: new Date(),
       });
       await MessageModel.create([newMsg1, newMsg2]);
-      body = { chats: [chat._id] };
     });
     afterAll(async () => {
       const collections = mongoose.connection.collections;
       const messageCollection = collections["messages"];
       if (messageCollection) await messageCollection.deleteMany();
     });
-
     it("should respond with an error when user is not authed", async () => {
       const response = await request(app)
-        .post(path)
-        .set("Authorization", "unAutheedToken")
-        .send({ ...body });
+        .get(path)
+        .set("Authorization", "unAutheedToken");
       expect(response.status).toBe(401);
       expect(response.body).toStrictEqual({
         message: "You are not signed in!",
       });
     });
-    it("should throw an error when chats is nullish", async () => {
-      const response = await request(app)
-        .post(path)
-        .set("Authorization", authedUserJwt)
-        .send({ ...body, chats: null });
-      expect(response.status).toBe(400);
-      expect(response.body).toStrictEqual({
-        message: "Chats Array was not provided!",
+    it("should respond with an error when chats are not found", async () => {
+      const userWithNoChats = await UserModel.create({
+        name: "user4",
+        email: "test4@emample.com",
+        password: "somePassword4",
       });
-    });
-    it("should throw an error when chats is not an array", async () => {
+      const jwt = createJWT(userWithNoChats);
       const response = await request(app)
-        .post(path)
-        .set("Authorization", authedUserJwt)
-        .send({ ...body, chats: "notAnArray" });
-      expect(response.status).toBe(400);
+        .get(path)
+        .set("Authorization", `Bearer ${jwt}`);
+      expect(response.status).toBe(404);
       expect(response.body).toStrictEqual({
-        message: "Chats Array was not provided!",
+        message: "Chats were not found",
       });
+      //remove user so the DB will stay the same for the rest of the tests
+      await UserModel.findByIdAndDelete(userWithNoChats._id);
     });
+
     it("should return messages array", async () => {
       const response = await request(app)
-        .post(path)
-        .set("Authorization", authedUserJwt)
-        .send({ ...body });
+        .get(path)
+        .set("Authorization", authedUserJwt);
       const messages: IMessageModel[] = response.body;
       expect(response.status).toBe(200);
       expect(messages.length).toBe(2);
@@ -270,7 +263,6 @@ describe("messageRouter", () => {
   });
   describe("updateReadBy", () => {
     let body: {
-      messages: string[];
       chatId: unknown;
     };
     let message1: IMessageModel;
@@ -294,7 +286,7 @@ describe("messageRouter", () => {
       const messages = await MessageModel.create([newMsg1, newMsg2]);
       message1 = messages[0];
       message2 = messages[1];
-      body = { chatId: chat._id, messages: [message1._id, message1._id] };
+      body = { chatId: chat._id };
     });
     afterAll(async () => {
       const collections = mongoose.connection.collections;
@@ -332,36 +324,7 @@ describe("messageRouter", () => {
         message: "chatId was not provided!",
       });
     });
-    it("should respond with an error when messages is nullish", async () => {
-      const response = await request(app)
-        .put(baseUrl)
-        .set("Authorization", authedUserJwt)
-        .send({ ...body, messages: null });
-      expect(response.status).toBe(400);
-      expect(response.body).toStrictEqual({
-        message: "Messages were not provided!",
-      });
-    });
-    it("should respond with an error when messages is not an array", async () => {
-      const response = await request(app)
-        .put(baseUrl)
-        .set("Authorization", authedUserJwt)
-        .send({ ...body, messages: "someString" });
-      expect(response.status).toBe(400);
-      expect(response.body).toStrictEqual({
-        message: "Messages were not provided!",
-      });
-    });
-    it("should respond with an error when messages is an empty array", async () => {
-      const response = await request(app)
-        .put(baseUrl)
-        .set("Authorization", authedUserJwt)
-        .send({ ...body, messages: [] });
-      expect(response.status).toBe(400);
-      expect(response.body).toStrictEqual({
-        message: "Messages were not provided!",
-      });
-    });
+
     it("should respond with an error when chat was not found", async () => {
       const response = await request(app)
         .put(baseUrl)
@@ -387,8 +350,19 @@ describe("messageRouter", () => {
       expect(response.body).toStrictEqual({
         message: "User is not part of this chat!",
       });
+      //remove the user after the test so DB will stay the same in all tests
+      await UserModel.findByIdAndDelete(userNotInChat._id);
     });
-    // it("should read messages", async () =>{})
+    it("should read messages", async () => {
+      const response = await request(app)
+        .put(baseUrl)
+        .set("Authorization", authedUserJwt)
+        .send({ ...body });
+      const res: IChatModel = response.body;
+      expect(res._id).toBeDefined();
+      expect(res._id.toString()).toBe(chat._id.toString());
+      expect(response.status).toBe(200);
+    });
   });
 });
 

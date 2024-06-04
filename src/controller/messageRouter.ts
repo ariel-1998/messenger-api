@@ -10,5 +10,5 @@ import {
 export const messageRouter = Router();
 messageRouter.use(jwtVerification);
 messageRouter.route("/").post(sendMessage).put(updateReadBy);
-messageRouter.post("/unread", getAllUnreadMessages);
-messageRouter.get("/:chatId", getAllMessagesByChatId);
+messageRouter.get("/unread", getAllUnreadMessages);
+messageRouter.get("/chat/:chatId", getAllMessagesByChatId);

@@ -7,21 +7,6 @@ import "../controllerSetup";
 
 const baseUrl = "/api/user";
 
-let mongoServer: MongoMemoryServer;
-process.env.JWT_SECRET = "someSecret";
-
-// beforeAll(async () => {
-//   mongoServer = await MongoMemoryServer.create();
-//   const uri = mongoServer.getUri();
-//   await mongoose.connect(uri);
-// });
-
-// afterAll(async () => {
-//   await mongoose.connection.dropDatabase();
-//   await mongoose.connection.close();
-//   await mongoServer.stop();
-// });
-
 const authedUser: User = {
   name: "ariel",
   email: "test@emample.com",
