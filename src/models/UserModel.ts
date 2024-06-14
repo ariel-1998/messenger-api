@@ -25,8 +25,9 @@ export const userSchema = new mongoose.Schema<IUserModel>(
     password: { type: String, required: [true, "Password is required"] },
     image: {
       type: String,
+      trim: true,
       default:
-        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
+        "http://res.cloudinary.com/dnlv6fy3z/image/upload/v1718276606/hyhe3h69womcfeqw1kjs.png",
     },
   },
   {

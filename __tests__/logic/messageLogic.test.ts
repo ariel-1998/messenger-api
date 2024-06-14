@@ -16,7 +16,6 @@ import { DynamicError } from "../../src/models/ErrorModel";
 import { ChatModel, IChatModel } from "../../src/models/ChatModel";
 import { IMessageModel, MessageModel } from "../../src/models/MessageModel";
 import mongoose, { ObjectId } from "mongoose";
-import { ClientSession } from "mongoose";
 
 jest.mock("../../src/models/ChatModel");
 jest.mock("../../src/models/MessageModel");
@@ -43,14 +42,7 @@ const message: IMessageModel = {
   content: "someContent",
   chat: chat as unknown as ObjectId,
   readBy: [] as mongoose.Schema.Types.ObjectId[],
-  frontendTimeStamp: new Date(),
 } as IMessageModel;
-const session = {
-  startTransaction: jest.fn(),
-  abortTransaction: jest.fn().mockResolvedValue(null),
-  endSession: jest.fn(),
-  commitTransaction: jest.fn().mockResolvedValue(null),
-};
 
 describe("messageLogic", () => {
   let request: CustomReq;
@@ -66,18 +58,13 @@ describe("messageLogic", () => {
   });
   describe("sendMessage", () => {
     const body: SendMessageBody = {
-      frontendTimeStamp: new Date(),
       chat: "chatId",
       content: "message",
     };
-    let startSessionMock: jest.SpyInstance;
     beforeEach(() => {
       request.body = { ...body };
       (ChatModel.findById as jest.Mock).mockResolvedValue(chat);
 
-      startSessionMock = jest
-        .spyOn(mongoose, "startSession")
-        .mockResolvedValue(session as unknown as ClientSession);
       (MessageModel.create as jest.Mock).mockImplementation(() => {
         const secondPopulate = {
           ...message,
@@ -87,7 +74,7 @@ describe("messageLogic", () => {
           ...message,
           populate: jest.fn().mockReturnValueOnce(secondPopulate),
         };
-        return Promise.resolve([firstPopulate]);
+        return Promise.resolve(firstPopulate);
       });
 
       (ChatModel.findByIdAndUpdate as jest.Mock).mockImplementation(() => {
@@ -139,32 +126,12 @@ describe("messageLogic", () => {
       expect(nextFn).toHaveBeenCalledTimes(1);
       expect(nextFn).toHaveBeenCalledWith(expectedErr);
     });
-    it("should call next with error when startSession throws an error", async () => {
-      startSessionMock.mockRejectedValueOnce("error");
-      const expectedErr = new DynamicError("An unknown error occurred!", 500);
-      await sendMessage(request, response, nextFn);
-      expect(nextFn).toHaveBeenCalledTimes(1);
-      expect(nextFn).toHaveBeenCalledWith(expectedErr);
-    });
-    it("should call startTransaction abortTransaction and endSession at an error when error accure after session was created", async () => {
-      (MessageModel.create as jest.Mock).mockRejectedValueOnce("error");
-      const expectedErr = new DynamicError("An unknown error occurred!", 500);
-      await sendMessage(request, response, nextFn);
-      expect(startSessionMock).toHaveBeenCalledTimes(1);
-      expect(session.startTransaction).toHaveBeenCalledTimes(1);
-      expect(session.abortTransaction).toHaveBeenCalledTimes(1);
-      expect(session.endSession).toHaveBeenCalledTimes(1);
-      expect(nextFn).toHaveBeenCalledTimes(1);
-      expect(nextFn).toHaveBeenCalledWith(expectedErr);
-    });
+
     it("should call next with error when MessageModel.create throws an error", async () => {
       const expectedErr = new DynamicError("An unknown error occurred!", 500);
       (MessageModel.create as jest.Mock).mockRejectedValueOnce("error");
       await sendMessage(request, response, nextFn);
-      expect(startSessionMock).toHaveBeenCalledTimes(1);
-      expect(session.startTransaction).toHaveBeenCalledTimes(1);
-      expect(session.abortTransaction).toHaveBeenCalledTimes(1);
-      expect(session.endSession).toHaveBeenCalledTimes(1);
+
       expect(nextFn).toHaveBeenCalledTimes(1);
       expect(nextFn).toHaveBeenCalledWith(expectedErr);
     });
@@ -177,26 +144,18 @@ describe("messageLogic", () => {
       };
       (MessageModel.create as jest.Mock).mockRejectedValueOnce(err);
       await sendMessage(request, response, nextFn);
-      expect(startSessionMock).toHaveBeenCalledTimes(1);
-      expect(session.startTransaction).toHaveBeenCalledTimes(1);
-      expect(session.abortTransaction).toHaveBeenCalledTimes(1);
-      expect(session.endSession).toHaveBeenCalledTimes(1);
+
       expect(nextFn).toHaveBeenCalledTimes(1);
       expect(nextFn).toHaveBeenCalledWith(expectedErr);
     });
     it("should throw an error when sender populate throws an error", async () => {
       const expectedErr = new DynamicError("An unknown error occurred!", 500);
-      (MessageModel.create as jest.Mock).mockResolvedValueOnce([
-        {
-          message,
-          populate: jest.fn().mockRejectedValueOnce("error"),
-        },
-      ]);
+      (MessageModel.create as jest.Mock).mockResolvedValueOnce({
+        message,
+        populate: jest.fn().mockRejectedValueOnce("error"),
+      });
       await sendMessage(request, response, nextFn);
-      expect(startSessionMock).toHaveBeenCalledTimes(1);
-      expect(session.startTransaction).toHaveBeenCalledTimes(1);
-      expect(session.abortTransaction).toHaveBeenCalledTimes(1);
-      expect(session.endSession).toHaveBeenCalledTimes(1);
+
       expect(nextFn).toHaveBeenCalledTimes(1);
       expect(nextFn).toHaveBeenCalledWith(expectedErr);
     });
@@ -210,42 +169,31 @@ describe("messageLogic", () => {
         const senderPopulate = jest
           .fn()
           .mockResolvedValueOnce(chatAndUserPopulate);
-        return Promise.resolve([
-          {
-            ...message,
-            populate: senderPopulate,
-          },
-        ]);
+        return Promise.resolve({
+          ...message,
+          populate: senderPopulate,
+        });
       });
       await sendMessage(request, response, nextFn);
-      expect(startSessionMock).toHaveBeenCalledTimes(1);
-      expect(session.startTransaction).toHaveBeenCalledTimes(1);
-      expect(session.abortTransaction).toHaveBeenCalledTimes(1);
-      expect(session.endSession).toHaveBeenCalledTimes(1);
+
       expect(nextFn).toHaveBeenCalledTimes(1);
       expect(nextFn).toHaveBeenCalledWith(expectedErr);
     });
-    it("should throw call next with error when ChatModel.findByIdAndUpdate throws an error", async () => {
+    it("should respond with messaage even when ChatModel.findByIdAndUpdate throws an error", async () => {
       const expectedErr = new DynamicError("An unknown error occurred!", 500);
-      (ChatModel.findByIdAndUpdate as jest.Mock).mockResolvedValueOnce({
-        session: jest.fn().mockRejectedValueOnce("error"),
-      });
+      (ChatModel.findByIdAndUpdate as jest.Mock).mockRejectedValueOnce(
+        "someError"
+      );
       await sendMessage(request, response, nextFn);
-      expect(startSessionMock).toHaveBeenCalledTimes(1);
-      expect(session.startTransaction).toHaveBeenCalledTimes(1);
-      expect(session.abortTransaction).toHaveBeenCalledTimes(1);
-      expect(session.endSession).toHaveBeenCalledTimes(1);
-      expect(nextFn).toHaveBeenCalledTimes(1);
-      expect(nextFn).toHaveBeenCalledWith(expectedErr);
+
+      expect(nextFn).not.toHaveBeenCalled();
+      expect(response.status).toHaveBeenCalledWith(200);
+      expect(response.json).toHaveBeenCalledWith(message);
     });
     it("should respond with message when message was created", async () => {
       await sendMessage(request, response, nextFn);
       expect(response.status).toHaveBeenCalledWith(200);
       expect(response.json).toHaveBeenCalledWith(message);
-      expect(session.abortTransaction).not.toHaveBeenCalled();
-      expect(session.commitTransaction).toHaveBeenCalledTimes(1);
-      expect(session.endSession).toHaveBeenCalledTimes(1);
-      expect(session.startTransaction).toHaveBeenCalledTimes(1);
     });
   });
   describe("getAllMessagesByChatId", () => {

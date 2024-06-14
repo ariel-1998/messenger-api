@@ -57,6 +57,7 @@ export const getAllChats = expressAsyncHandler(
           populate: { path: "sender", select: "-password" },
         })
         .sort({ updatedAt: -1 });
+
       res.json(chats);
     } catch (error) {
       next(new DynamicError("Serever Error!", 500));

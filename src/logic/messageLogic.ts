@@ -2,21 +2,21 @@ import expressAsyncHandler from "express-async-handler";
 import { CustomReq } from "../models/CustomReq";
 import { NextFunction, Response } from "express";
 import { DBErrorHandler, DynamicError } from "../models/ErrorModel";
-import { IMessageModel, MessageModel } from "../models/MessageModel";
-import mongoose, { ObjectId, startSession } from "mongoose";
+import { MessageModel } from "../models/MessageModel";
+import { ObjectId } from "mongoose";
 import { ChatModel } from "../models/ChatModel";
+
 export type SendMessageBody = {
   content: string;
   chat: string;
-  frontendTimeStamp: Date;
 };
 export const sendMessage = expressAsyncHandler(
   async (req: CustomReq, res: Response, next: NextFunction) => {
-    let session: mongoose.mongo.ClientSession | undefined = undefined;
+    console.log("here");
     const {
       content,
       chat: chatId,
-      frontendTimeStamp,
+      // frontendTimeStamp,
     } = req.body as SendMessageBody;
     const jwtUserId: ObjectId = req.user._id;
 
@@ -25,7 +25,7 @@ export const sendMessage = expressAsyncHandler(
       chat: chatId,
       sender: jwtUserId,
       readBy: [],
-      frontendTimeStamp,
+      // frontendTimeStamp,
     });
 
     if (!content || typeof content !== "string" || !content.trim() || !chatId)
@@ -47,31 +47,26 @@ export const sendMessage = expressAsyncHandler(
           )
         );
 
-      session = await startSession();
-      session.startTransaction();
-      let message: IMessageModel;
+      let message = await MessageModel.create(newMsg);
 
-      const messageArr = await MessageModel.create([newMsg], { session });
-      message = messageArr[0];
       message = await message.populate("sender", "name image");
 
       message = await message.populate({
         path: "chat",
         populate: { path: "users", select: "-password" },
       });
-      await ChatModel.findByIdAndUpdate(chatId, {
-        latestMessage: message,
-      }).session(session);
-      await session.commitTransaction();
+
+      try {
+        await ChatModel.findByIdAndUpdate(chatId, {
+          latestMessage: message,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+
       res.status(200).json(message);
     } catch (error) {
-      console.log(error);
-      try {
-        await session?.abortTransaction();
-      } catch (error) {}
       return next(DBErrorHandler.handle(error));
-    } finally {
-      session?.endSession();
     }
   }
 );

@@ -16,6 +16,7 @@ export const registerUser = expressAsyncHandler(
       }
 
       const rawUser: IUserModel = new UserModel(req.body);
+      console.log(rawUser);
       const errors = rawUser.validateSync();
       if (errors) return next(new MongoErrorModel(errors));
 

@@ -58,7 +58,6 @@ describe("messageRouter", () => {
       body = {
         chat: chat._id,
         content: "message",
-        frontendTimeStamp: new Date(),
       };
     });
     afterEach(async () => {
@@ -147,14 +146,12 @@ describe("messageRouter", () => {
         chat: chat._id,
         sender: createdUser1._id,
         readBy: [],
-        frontendTimeStamp: new Date(),
       });
       const newMsg2 = new MessageModel({
         content: "someContent",
         chat: chat._id,
         sender: createdUser1._id,
         readBy: [],
-        frontendTimeStamp: new Date(),
       });
       await MessageModel.create([newMsg1, newMsg2]);
       path = `${baseUrl}/chat/${chat._id}`;
@@ -209,14 +206,12 @@ describe("messageRouter", () => {
         chat: chat._id,
         sender: createdUser2._id,
         readBy: [],
-        frontendTimeStamp: new Date(),
       });
       const newMsg2 = new MessageModel({
         content: "someContent",
         chat: chat._id,
         sender: createdUser2._id,
         readBy: [],
-        frontendTimeStamp: new Date(),
       });
       await MessageModel.create([newMsg1, newMsg2]);
     });
@@ -274,14 +269,12 @@ describe("messageRouter", () => {
         chat: chat._id,
         sender: createdUser2._id,
         readBy: [],
-        frontendTimeStamp: new Date(),
       });
       const newMsg2 = new MessageModel({
         content: "someContent",
         chat: chat._id,
         sender: createdUser2._id,
         readBy: [],
-        frontendTimeStamp: new Date(),
       });
       const messages = await MessageModel.create([newMsg1, newMsg2]);
       message1 = messages[0];

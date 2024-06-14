@@ -8,7 +8,6 @@ export type IMessageModel = {
   content: string;
   chat: mongoose.Schema.Types.ObjectId;
   readBy: mongoose.Schema.Types.ObjectId[];
-  frontendTimeStamp: Date;
 } & mongoose.Document;
 
 const messageSchema = new mongoose.Schema<IMessageModel>(
@@ -36,13 +35,9 @@ const messageSchema = new mongoose.Schema<IMessageModel>(
         default: [],
       },
     ],
-    frontendTimeStamp: {
-      type: Date,
-      required: [true, "frontendTimeStamp was not provided!"],
-    },
   },
   {
-    timestamps: false,
+    timestamps: true,
     versionKey: false,
   }
 );
